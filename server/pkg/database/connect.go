@@ -20,7 +20,7 @@ func init() {
 	}
 }
 
-func ConnectDB() error {
+func ConnectDB() (*mongo.Database, error) {
 	uri := os.Getenv("MONGODB_URI")
 
 	if uri == "" {
@@ -34,16 +34,18 @@ func ConnectDB() error {
 	// connect database
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
-		return fmt.Errorf("Failed to connect to database: %v", err)
+		return nil, fmt.Errorf("Failed to connect to database: %v", err)
 	}
 
 	// ping the database to verify connection
 	err = client.Ping(ctx, nil)
 	if err != nil {
-		return fmt.Errorf("Could not ping to the database: %v", err)
+		return nil, fmt.Errorf("Could not ping to the database: %v", err)
 	}
 
 	fmt.Println("Successfully connected to the MongoDB database")
 
-	return nil
+	database := client.Database("task-manager")
+
+	return database, nil
 }
