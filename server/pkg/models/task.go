@@ -73,3 +73,47 @@ func GetTasks() ([]Task, error) {
 
 	return tasks, nil
 }
+
+func GetTaskById(id string) (Task, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var task Task
+
+	objID, _ := primitive.ObjectIDFromHex(id)
+
+	err := taskCollection.FindOne(ctx, bson.M{"_id": objID}).Decode(&task)
+
+	return task, err
+}
+
+func DeleteTask(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	objID, _ := primitive.ObjectIDFromHex(id)
+
+	_, err := taskCollection.DeleteOne(ctx, bson.M{"_id": objID})
+
+	return err
+}
+
+func (t *Task) UpdateTask() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	t.UpdatedAt = time.Now()
+
+	update := bson.M{
+		"$set": bson.M{
+			"title":       t.Title,
+			"description": t.Description,
+			"status":      t.Status,
+			"updated_at":  t.UpdatedAt,
+		},
+	}
+
+	_, err := taskCollection.UpdateOne(ctx, bson.M{"_id": t.ID}, update)
+
+	return err
+}
