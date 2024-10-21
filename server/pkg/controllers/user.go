@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/abdulrafay-07/task-manager/pkg/auth"
 	"github.com/abdulrafay-07/task-manager/pkg/models"
 	"github.com/abdulrafay-07/task-manager/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -45,7 +46,12 @@ func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSONResponse(w, http.StatusCreated, utils.Response{
 		Success: true,
 		Message: "User registered successfully!",
-		Data:    user,
+		Data: map[string]string{
+			"id":         user.ID.String(),
+			"name":       user.Name,
+			"email":      user.Email,
+			"created_at": user.CreatedAt.String(),
+		},
 	})
 }
 
@@ -84,11 +90,18 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: generate jwt token
+	token, err := auth.GenerateToken(user.ID.Hex())
+	if err != nil {
+		utils.SendJSONResponse(w, http.StatusInternalServerError, utils.Response{
+			Success: false,
+			Message: "Error generating token",
+		})
+		return
+	}
 
 	utils.SendJSONResponse(w, http.StatusOK, utils.Response{
 		Success: true,
 		Message: "Login successful!",
-		Data:    user,
+		Data:    map[string]string{"token": token},
 	})
 }

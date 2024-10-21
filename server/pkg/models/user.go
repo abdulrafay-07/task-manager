@@ -13,7 +13,7 @@ type User struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Name      string             `bson:"name" json:"name"`
 	Email     string             `bson:"email" json:"email"`
-	Password  string             `bson:"password" json:"-"` // the "-" ensures the password is not included in JSON responses
+	Password  string             `bson:"password" json:"password"` // the "-" ensures the password is not included in JSON responses
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 }
 

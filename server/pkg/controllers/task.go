@@ -7,10 +7,12 @@ import (
 	"github.com/abdulrafay-07/task-manager/pkg/models"
 	"github.com/abdulrafay-07/task-manager/pkg/utils"
 	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func CreateTask(w http.ResponseWriter, r *http.Request) {
 	var task models.Task
+	userID := r.Context().Value("user_id").(string)
 
 	err := json.NewDecoder(r.Body).Decode(&task)
 	if err != nil {
@@ -21,21 +23,24 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userObjID, _ := primitive.ObjectIDFromHex(userID)
+	task.UserID = userObjID
+
+	_, err = models.GetUserById(userObjID.String())
+	if err != nil {
+		utils.SendJSONResponse(w, http.StatusBadRequest, utils.Response{
+			Success: false,
+			Message: "User not found!",
+		})
+		return
+	}
+
 	// validate fields
 	validationErr := utils.ValidateTaskFields(task)
 	if validationErr != nil {
 		utils.SendJSONResponse(w, http.StatusBadRequest, utils.Response{
 			Success: false,
 			Message: validationErr.Error(),
-		})
-		return
-	}
-
-	_, err = models.GetUserById(task.UserID.Hex())
-	if err != nil {
-		utils.SendJSONResponse(w, http.StatusBadRequest, utils.Response{
-			Success: false,
-			Message: "User not found!",
 		})
 		return
 	}
