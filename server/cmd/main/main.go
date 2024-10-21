@@ -18,10 +18,12 @@ func main() {
 	}
 
 	models.SetTaskCollection(db)
+	models.SetUserCollection(db)
 
 	r := mux.NewRouter()
 
 	routes.SetupTaskRoutes(r)
+	routes.SetupAuthRoutes(r)
 
 	http.ListenAndServe(":80", r)
 }

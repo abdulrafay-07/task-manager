@@ -19,6 +19,7 @@ const (
 
 type Task struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
+	UserID      primitive.ObjectID `bson:"user_id" json:"user_id"`
 	Title       string             `bson:"title" json:"title"`
 	Description string             `bson:"description" json:"description"`
 	Status      TaskStatus         `bson:"status" json:"status"`

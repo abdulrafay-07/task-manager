@@ -8,6 +8,10 @@ import (
 )
 
 func ValidateTaskFields(task models.Task) error {
+	if strings.TrimSpace(task.UserID.String()) == "" {
+		return fmt.Errorf("User ID is required")
+	}
+
 	if strings.TrimSpace(task.Title) == "" {
 		return fmt.Errorf("title is required")
 	}

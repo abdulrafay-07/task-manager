@@ -31,6 +31,15 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, err = models.GetUserById(task.UserID.Hex())
+	if err != nil {
+		utils.SendJSONResponse(w, http.StatusBadRequest, utils.Response{
+			Success: false,
+			Message: "User not found!",
+		})
+		return
+	}
+
 	// create task
 	err = task.CreateTask()
 	if err != nil {

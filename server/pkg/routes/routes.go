@@ -12,3 +12,8 @@ func SetupTaskRoutes(router *mux.Router) {
 	router.HandleFunc("/task/{id}", controllers.UpdateTask).Methods("PUT")
 	router.HandleFunc("/task/{id}", controllers.GetTaskById).Methods("GET")
 }
+
+func SetupAuthRoutes(router *mux.Router) {
+	router.HandleFunc("/auth/register", controllers.RegisterUser).Methods("POST")
+	router.HandleFunc("/auth/login", controllers.LoginUser).Methods("POST")
+}
