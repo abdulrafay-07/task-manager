@@ -102,6 +102,11 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSONResponse(w, http.StatusOK, utils.Response{
 		Success: true,
 		Message: "Login successful!",
-		Data:    map[string]string{"token": token},
+		Data: map[string]string{
+			"user_id":    user.ID.String(),
+			"username":   user.Name,
+			"user_email": user.Email,
+			"token":      token,
+		},
 	})
 }
