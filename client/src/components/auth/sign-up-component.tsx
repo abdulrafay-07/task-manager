@@ -1,7 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import axios, { AxiosError } from "axios";
+
 import {
    Form,
    FormControl,
@@ -20,11 +22,18 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck2 } from "lucide-react";
+import ErrorMessage from "@/components/shared/error-message";
+import SuccessMessage from "@/components/shared/success-message";
+import { CalendarCheck2, Loader2 } from "lucide-react";
 
 import { signUpSchema } from "@/schemas/auth";
+import { ServerResponse } from "@/types/server-response";
 
 const SignUpComponent = () => {
+   const [error, setError] = useState("");
+   const [success, setSuccess] = useState("");
+   const [isSubmitting, setIsSubmitting] = useState(false);
+
    const form = useForm<z.infer<typeof signUpSchema>>({
       resolver: zodResolver(signUpSchema),
       defaultValues: {
@@ -35,7 +44,19 @@ const SignUpComponent = () => {
    });
 
    const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
-      console.log(data);
+      setError("");
+      setSuccess("");
+      setIsSubmitting(true);
+      try {
+         const response = await axios.post<ServerResponse>("http://localhost/auth/register", data);
+
+         setSuccess(response.data.message);
+      } catch (error) {
+         const axiosError = error as AxiosError<ServerResponse>;
+         setError(axiosError.response?.data.message!);
+      } finally {
+         setIsSubmitting(false);
+      };
    };
 
    return (
@@ -89,8 +110,16 @@ const SignUpComponent = () => {
                            </FormItem>
                         )}
                      />
+
+                     <ErrorMessage message={error} />
+                     <SuccessMessage message={success} />
+
                      <Button className="w-full">
-                        Sign Up
+                        {isSubmitting ? (
+                           <Loader2 className="animate-spin" />
+                        ) : (
+                           "Log In"
+                        )}
                      </Button>
                   </form>
                </Form>

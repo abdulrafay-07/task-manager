@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import ErrorMessage from "@/components/shared/error-message";
+import SuccessMessage from "@/components/shared/success-message";
 import { CalendarCheck2, Loader2 } from "lucide-react";
 
 import { loginSchema } from "@/schemas/auth";
@@ -31,6 +33,8 @@ import { ServerResponse } from "@/types/server-response";
 import { login } from "@/store/auth-slice";
 
 const LoginComponent = () => {
+   const [error, setError] = useState("");
+   const [success, setSuccess] = useState("");
    const [isSubmitting, setIsSubmitting] = useState(false);
    const navigate = useNavigate();
    const dispatch = useDispatch();
@@ -44,6 +48,8 @@ const LoginComponent = () => {
    });
 
    const onSubmit = async (data: z.infer<typeof loginSchema>) => {
+      setError("");
+      setSuccess("");
       setIsSubmitting(true);
       try {
          const response = await axios.post<ServerResponse>("http://localhost/auth/login", data);
@@ -54,6 +60,8 @@ const LoginComponent = () => {
             user_email: response.data.data.user_email,
          };
 
+         setSuccess(response.data.message);
+
          dispatch(login({
             userData,
             token: response.data.data.token,
@@ -62,7 +70,7 @@ const LoginComponent = () => {
          navigate("/");
       } catch (error) {
          const axiosError = error as AxiosError<ServerResponse>;
-         console.log(axiosError.response?.data.message);
+         setError(axiosError.response?.data.message!);
       } finally {
          setIsSubmitting(false);
       };
@@ -106,6 +114,10 @@ const LoginComponent = () => {
                            </FormItem>
                         )}
                      />
+
+                     <ErrorMessage message={error} />
+                     <SuccessMessage message={success} />
+
                      <Button className="w-full">
                         {isSubmitting ? (
                            <Loader2 className="animate-spin" />
