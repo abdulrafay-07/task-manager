@@ -1,7 +1,11 @@
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import axios, { AxiosError } from "axios";
+
 import {
    Form,
    FormControl,
@@ -20,11 +24,17 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck2 } from "lucide-react";
+import { CalendarCheck2, Loader2 } from "lucide-react";
 
 import { loginSchema } from "@/schemas/auth";
+import { ServerResponse } from "@/types/server-response";
+import { login } from "@/store/auth-slice";
 
 const LoginComponent = () => {
+   const [isSubmitting, setIsSubmitting] = useState(false);
+   const navigate = useNavigate();
+   const dispatch = useDispatch();
+
    const form = useForm<z.infer<typeof loginSchema>>({
       resolver: zodResolver(loginSchema),
       defaultValues: {
@@ -34,7 +44,28 @@ const LoginComponent = () => {
    });
 
    const onSubmit = async (data: z.infer<typeof loginSchema>) => {
-      console.log(data);
+      setIsSubmitting(true);
+      try {
+         const response = await axios.post<ServerResponse>("http://localhost/auth/login", data);
+
+         const userData = {
+            user_id: response.data.data.user_id,
+            username: response.data.data.username,
+            user_email: response.data.data.user_email,
+         };
+
+         dispatch(login({
+            userData,
+            token: response.data.data.token,
+         }));
+
+         navigate("/");
+      } catch (error) {
+         const axiosError = error as AxiosError<ServerResponse>;
+         console.log(axiosError.response?.data.message);
+      } finally {
+         setIsSubmitting(false);
+      };
    };
 
    return (
@@ -76,7 +107,11 @@ const LoginComponent = () => {
                         )}
                      />
                      <Button className="w-full">
-                        Log In
+                        {isSubmitting ? (
+                           <Loader2 className="animate-spin" />
+                        ) : (
+                           "Log In"
+                        )}
                      </Button>
                   </form>
                </Form>

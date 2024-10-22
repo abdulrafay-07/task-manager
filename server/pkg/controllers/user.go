@@ -103,10 +103,29 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		Success: true,
 		Message: "Login successful!",
 		Data: map[string]string{
-			"user_id":    user.ID.String(),
+			"user_id":    user.ID.Hex(),
 			"username":   user.Name,
 			"user_email": user.Email,
 			"token":      token,
 		},
+	})
+}
+
+func VerifyToken(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value("user_id").(string)
+
+	user, err := models.GetUserById(userID)
+	if err != nil {
+		utils.SendJSONResponse(w, http.StatusUnauthorized, utils.Response{
+			Success: false,
+			Message: "Invalid token",
+		})
+		return
+	}
+
+	utils.SendJSONResponse(w, http.StatusOK, utils.Response{
+		Success: true,
+		Message: "Token is valid",
+		Data:    user,
 	})
 }

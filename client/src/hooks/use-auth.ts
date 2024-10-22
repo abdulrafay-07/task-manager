@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 
-import { login, logout } from "@/store/auth-slice";
+import { logout } from "@/store/auth-slice";
 import { ServerResponse } from "@/types/server-response";
 
 interface useAuthProps {
@@ -34,7 +34,7 @@ const useAuth = ({
          };
          
          try {
-            const response = await axios.get<ServerResponse>("http://localhost:3000/verify-token", {
+            const response = await axios.get<ServerResponse>("http://localhost/auth/verify-token", {
                headers: {
                   "Authorization": `Bearer ${token}`,
                },
@@ -43,11 +43,6 @@ const useAuth = ({
             if (!response.data.success) {
                throw new Error("Unauthorized");
             };
-
-            dispatch(login({
-               userData: response.data.user,
-               token,
-            }));
 
             if (!authentication) {
                navigate("/");

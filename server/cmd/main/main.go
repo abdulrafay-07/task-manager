@@ -8,6 +8,7 @@ import (
 	"github.com/abdulrafay-07/task-manager/pkg/models"
 	"github.com/abdulrafay-07/task-manager/pkg/routes"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -25,5 +26,15 @@ func main() {
 	routes.SetupTaskRoutes(r)
 	routes.SetupAuthRoutes(r)
 
-	http.ListenAndServe(":80", r)
+	// configure CORS options
+	corsOptions := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:5173"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	})
+
+	handler := corsOptions.Handler(r)
+
+	http.ListenAndServe(":80", handler)
 }

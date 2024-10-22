@@ -17,4 +17,5 @@ func SetupTaskRoutes(router *mux.Router) {
 func SetupAuthRoutes(router *mux.Router) {
 	router.HandleFunc("/auth/register", controllers.RegisterUser).Methods("POST")
 	router.HandleFunc("/auth/login", controllers.LoginUser).Methods("POST")
+	router.HandleFunc("/auth/verify-token", middleware.AuthMiddleware(controllers.VerifyToken)).Methods("GET")
 }
