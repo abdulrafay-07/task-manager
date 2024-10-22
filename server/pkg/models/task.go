@@ -34,11 +34,12 @@ func SetTaskCollection(database *mongo.Database) {
 	taskCollection = database.Collection("tasks")
 }
 
-func (t *Task) CreateTask() error {
+func (t *Task) CreateTask(userId primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	t.ID = primitive.NewObjectID()
+	t.UserID = userId
 	t.CreatedAt = time.Now()
 	t.UpdatedAt = time.Now()
 

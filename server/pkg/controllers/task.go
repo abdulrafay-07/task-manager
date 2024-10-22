@@ -23,10 +23,16 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userObjID, _ := primitive.ObjectIDFromHex(userID)
-	task.UserID = userObjID
+	userObjID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		utils.SendJSONResponse(w, http.StatusBadRequest, utils.Response{
+			Success: false,
+			Message: "Invalid user ID format",
+		})
+		return
+	}
 
-	_, err = models.GetUserById(userObjID.String())
+	_, err = models.GetUserById(userID)
 	if err != nil {
 		utils.SendJSONResponse(w, http.StatusBadRequest, utils.Response{
 			Success: false,
@@ -46,7 +52,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// create task
-	err = task.CreateTask()
+	err = task.CreateTask(userObjID)
 	if err != nil {
 		utils.SendJSONResponse(w, http.StatusInternalServerError, utils.Response{
 			Success: false,
