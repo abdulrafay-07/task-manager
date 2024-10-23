@@ -5,6 +5,6 @@ export interface ServerResponse {
       user_id: string;
       user_email: string;
       username: string;
-      token: string;
+      token?: string;
    };
 };

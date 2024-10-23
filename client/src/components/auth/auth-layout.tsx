@@ -11,9 +11,7 @@ const AuthLayout = ({
 }: AuthLayoutProps) => {
    const { isLoading, error } = useAuth({ authentication });
 
-   if (isLoading) {
-      return <div>Loading...</div>;
-   };
+   if (isLoading) return null
 
    if (error) {
       return <div>Error: {error.message}</div>;

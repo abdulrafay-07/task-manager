@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 
-import { logout } from "@/store/auth-slice";
+import { login, logout } from "@/store/auth-slice";
 import { ServerResponse } from "@/types/server-response";
 
 interface useAuthProps {
@@ -44,9 +44,20 @@ const useAuth = ({
                throw new Error("Unauthorized");
             };
 
+            const userData = {
+               user_id: response.data.data.user_id,
+               username: response.data.data.username,
+               user_email: response.data.data.user_email,
+            };
+
+            dispatch(login({
+               userData,
+               token: localStorage.getItem("token")!,
+            }));
+
             if (!authentication) {
                navigate("/");
-            }
+            };
          } catch (error) {
             console.error('Auth verification failed:', error);
             setError(error instanceof Error ? error : new Error('Verification failed'));

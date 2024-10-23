@@ -64,7 +64,7 @@ const LoginComponent = () => {
 
          dispatch(login({
             userData,
-            token: response.data.data.token,
+            token: response.data.data.token!,
          }));
 
          navigate("/");

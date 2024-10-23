@@ -8,6 +8,7 @@ import { store } from "@/store/store";
 import Home from "@/pages/home.tsx";
 import LoginPage from "@/pages/auth/login";
 import SignUpPage from "@/pages/auth/sign-up";
+import MyTasks from "@/pages/my-tasks";
 import AuthLayout from "@/components/auth/auth-layout";
 import App from "@/App.tsx";
 
@@ -39,6 +40,14 @@ const router = createBrowserRouter([
         element: (
           <AuthLayout authentication={false}>
             <SignUpPage />
+          </AuthLayout>
+        )
+      },
+      {
+        path: "/my-tasks",
+        element: (
+          <AuthLayout authentication={true}>
+            <MyTasks />
           </AuthLayout>
         )
       },
