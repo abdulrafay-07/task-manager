@@ -12,6 +12,7 @@ func SetupTaskRoutes(router *mux.Router) {
 	router.HandleFunc("/task/{id}", middleware.AuthMiddleware(controllers.DeleteTask)).Methods("DELETE")
 	router.HandleFunc("/task/{id}", middleware.AuthMiddleware(controllers.UpdateTask)).Methods("PUT")
 	router.HandleFunc("/task/{id}", middleware.AuthMiddleware(controllers.GetTaskById)).Methods("GET")
+	router.HandleFunc("/task/u/{userId}", middleware.AuthMiddleware(controllers.GetTasksByUserId)).Methods("GET")
 }
 
 func SetupAuthRoutes(router *mux.Router) {

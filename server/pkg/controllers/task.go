@@ -194,3 +194,41 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 		Data:    existingTask,
 	})
 }
+
+func GetTasksByUserId(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	userID := vars["userId"]
+
+	_, err := models.GetUserById(userID)
+	if err != nil {
+		utils.SendJSONResponse(w, http.StatusBadRequest, utils.Response{
+			Success: false,
+			Message: "User not found!",
+		})
+		return
+	}
+
+	tasks, err := models.GetTasksByUserId(userID)
+	if err != nil {
+		utils.SendJSONResponse(w, http.StatusBadRequest, utils.Response{
+			Success: false,
+			Message: "Error fetching user tasks",
+		})
+		return
+	}
+
+	if len(tasks) == 0 {
+		utils.SendJSONResponse(w, http.StatusBadRequest, utils.Response{
+			Success: false,
+			Message: "User tasks not found",
+		})
+		return
+	}
+
+	utils.SendJSONResponse(w, http.StatusOK, utils.Response{
+		Success: true,
+		Message: "Tasks fetched successfully",
+		Tasks:   tasks,
+	})
+}

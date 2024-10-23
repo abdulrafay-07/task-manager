@@ -119,3 +119,29 @@ func (t *Task) UpdateTask() error {
 
 	return err
 }
+
+func GetTasksByUserId(userID string) ([]Task, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	userObjID, err := primitive.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var tasks []Task
+
+	cursor, err := taskCollection.Find(ctx, bson.M{"user_id": userObjID})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var task Task
+		cursor.Decode(&task)
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
+}

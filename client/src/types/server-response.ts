@@ -1,3 +1,5 @@
+import { Task } from "@/types/task";
+
 export interface ServerResponse {
    success: boolean;
    message: string;
@@ -7,4 +9,5 @@ export interface ServerResponse {
       username: string;
       token?: string;
    };
+   tasks: Task[];
 };
