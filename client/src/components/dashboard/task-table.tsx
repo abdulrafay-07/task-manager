@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 import axios, { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
+import DeleteDialog from "@/components/shared/delete-dialog";
 import {
    Table,
    TableBody,
@@ -28,19 +30,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Edit, Trash2 } from "lucide-react";
+import { Check, CheckCircle, Edit } from "lucide-react";
 
 import { getStatusColor, getStatusUpdatedText } from "@/lib/task-status";
 import { ServerResponse } from "@/types/server-response";
 import { Store } from "@/types/store";
 import { Task } from "@/types/task";
 
-
 const TaskTable = () => {
    const [tasks, setTasks] = useState<Task[]>([]);
    const [isLoading, setIsLoading] = useState(true);
    const [filter, setFilter] = useState("All");
    const [search, setSearch] = useState("");
+   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
    const userId = useSelector((state: Store) => state.auth.userData?.user_id);
 
@@ -53,12 +55,18 @@ const TaskTable = () => {
    });
 
    const deleteTask = async (id: string) => {
-      // TODO: add toasts
       try {
          const response = await axios.delete<ServerResponse>(`http://localhost/task/${id}`, {
             headers: {
                "Authorization": `Bearer ${localStorage.getItem("token")}`,
             },
+         });
+
+         toast(response.data.message, {
+            icon: <CheckCircle className="h-6 w-6 text-green-500" />,
+            style: {
+               backgroundColor: "beige",
+            }
          });
 
          setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
@@ -87,7 +95,7 @@ const TaskTable = () => {
 
    useEffect(() => {
       setIsLoading(true);
-      getUserTasks()
+      getUserTasks();
    }, []);
 
    if (isLoading) return (
@@ -151,14 +159,12 @@ const TaskTable = () => {
                               <Edit className="h-4 w-4" />
                               <span className="sr-only">Edit task</span>
                            </Button>
-                           <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => deleteTask(task.id)}
-                           >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete task</span>
-                           </Button>
+                           <DeleteDialog
+                              isOpen={isDeleteModalOpen}
+                              setIsOpen={setIsDeleteModalOpen}
+                              deleteTask={deleteTask}
+                              id={task.id}
+                           />
                         </div>
                      </TableCell>
                   </TableRow>
