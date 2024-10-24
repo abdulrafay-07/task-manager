@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 
+import EditDialog from "@/components/shared/edit-dialog";
 import DeleteDialog from "@/components/shared/delete-dialog";
 import {
    Table,
@@ -20,8 +21,7 @@ import {
    SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { AlertCircle, CheckCircle, Edit } from "lucide-react";
+import { AlertCircle, CheckCircle } from "lucide-react";
 
 import { getStatusColor, getStatusUpdatedText } from "@/lib/task-status";
 import { ServerResponse } from "@/types/server-response";
@@ -39,6 +39,7 @@ const TaskTable = ({
    const [filter, setFilter] = useState("All");
    const [search, setSearch] = useState("");
    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
    const filteredTasks = tasks.filter((task) => {
       const matchesFilter = filter === "All" || getStatusUpdatedText(task.status) === filter;
@@ -97,7 +98,7 @@ const TaskTable = ({
                </SelectContent>
             </Select>
          </div>
-         <Table className="w-[48rem] overflow-x-auto">
+         <Table className="w-[48rem] md:w-auto overflow-x-auto">
             <TableHeader>
                <TableRow>
                   <TableHead>Title</TableHead>
@@ -122,14 +123,12 @@ const TaskTable = ({
                      </TableCell>
                      <TableCell>
                         <div className="flex gap-2">
-                           <Button
-                              variant="outline"
-                              size="icon"
-                              // onClick={() => handleEdit(task)} TODO: add edit functionality
-                           >
-                              <Edit className="h-4 w-4" />
-                              <span className="sr-only">Edit task</span>
-                           </Button>
+                           <EditDialog
+                              task={task}
+                              isOpen={isEditModalOpen}
+                              setIsOpen={setIsEditModalOpen}
+                              setTasks={setTasks}
+                           />
                            <DeleteDialog
                               isOpen={isDeleteModalOpen}
                               setIsOpen={setIsDeleteModalOpen}

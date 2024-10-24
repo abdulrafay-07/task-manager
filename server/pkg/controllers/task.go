@@ -191,7 +191,7 @@ func UpdateTask(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSONResponse(w, http.StatusOK, utils.Response{
 		Success: true,
 		Message: "Task updated successfully!",
-		Data:    existingTask,
+		Task:    existingTask,
 	})
 }
 
