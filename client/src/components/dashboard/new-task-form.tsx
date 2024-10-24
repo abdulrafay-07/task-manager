@@ -3,9 +3,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import axios, { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
-import ErrorMessage from "@/components/shared/error-message";
-import SuccessMessage from "@/components/shared/success-message";
 import {
    Form,
    FormControl,
@@ -24,22 +23,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle, Loader2 } from "lucide-react";
 
 import { createTaskSchema } from "@/schemas/task";
 import { ServerResponse } from "@/types/server-response";
+import { Task } from "@/types/task";
 
 interface NewTaskFormProps {
    isDialogOpen: boolean;
-   setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>
+   setIsDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 };
 
 const NewTaskForm = ({
    isDialogOpen,
    setIsDialogOpen,
+   setTasks,
 }: NewTaskFormProps) => {
-   const [error, setError] = useState("");
-   const [success, setSuccess] = useState("");
    const [isSubmitting, setIsSubmitting] = useState(false);
 
    const form = useForm<z.infer<typeof createTaskSchema>>({
@@ -52,8 +52,6 @@ const NewTaskForm = ({
    });
 
    const onSubmit = async (data: z.infer<typeof createTaskSchema>) => {
-      setError("");
-      setSuccess("");
       setIsSubmitting(true);
       try {
          const response = await axios.post<ServerResponse>("http://localhost/task", data, {
@@ -62,10 +60,24 @@ const NewTaskForm = ({
             }
          });
 
-         setSuccess(response.data.message);
+         toast(response.data.message, {
+            icon: <CheckCircle className="h-6 w-6 text-green-500" />,
+            style: {
+               backgroundColor: "beige",
+            },
+         });
+
+         const newTask = response.data.task;
+
+         setTasks(prevTasks => [...prevTasks, newTask]);
       } catch (error) {
          const axiosError = error as AxiosError<ServerResponse>;
-         setError(axiosError.response?.data.message!); 
+         toast(axiosError.response?.data.message!, {
+            icon: <AlertCircle className="h-6 w-6 text-red-500" />,
+            style: {
+               backgroundColor: "beige",
+            },
+         }); 
       } finally {
          setIsSubmitting(false);
          setIsDialogOpen(!isDialogOpen);
@@ -138,8 +150,6 @@ const NewTaskForm = ({
                   )}
                </Button>
             </div>
-            <ErrorMessage message={error} />
-            <SuccessMessage message={success} />
          </form>
       </Form>
    )

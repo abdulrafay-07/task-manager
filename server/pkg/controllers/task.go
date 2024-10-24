@@ -64,7 +64,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	utils.SendJSONResponse(w, http.StatusCreated, utils.Response{
 		Success: true,
 		Message: "Task created successfully!",
-		Data:    task,
+		Task:    task,
 	})
 }
 

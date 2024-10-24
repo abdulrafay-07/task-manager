@@ -14,8 +14,15 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
 import { Store } from "@/types/store";
+import { Task } from "@/types/task";
 
-const Greetings = () => {
+interface GreetingsProps {
+   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+};
+
+const Greetings = ({
+   setTasks,
+}: GreetingsProps) => {
    const [username, setUsername] = useState("");
    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -48,6 +55,7 @@ const Greetings = () => {
                <NewTaskForm
                   isDialogOpen={isDialogOpen}
                   setIsDialogOpen={setIsDialogOpen}
+                  setTasks={setTasks}
                />
             </DialogContent>
          </Dialog>

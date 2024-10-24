@@ -10,4 +10,5 @@ export interface ServerResponse {
       token?: string;
    };
    tasks: Task[];
+   task: Task;
 };

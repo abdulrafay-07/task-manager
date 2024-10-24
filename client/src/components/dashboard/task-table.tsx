@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useState } from "react";
 
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
@@ -20,31 +19,26 @@ import {
    SelectTrigger,
    SelectValue,
 } from "@/components/ui/select";
-import {
-   Dialog,
-   DialogContent,
-   DialogHeader,
-   DialogTitle,
-   DialogFooter,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Check, CheckCircle, Edit } from "lucide-react";
+import { AlertCircle, CheckCircle, Edit } from "lucide-react";
 
 import { getStatusColor, getStatusUpdatedText } from "@/lib/task-status";
 import { ServerResponse } from "@/types/server-response";
-import { Store } from "@/types/store";
 import { Task } from "@/types/task";
 
-const TaskTable = () => {
-   const [tasks, setTasks] = useState<Task[]>([]);
-   const [isLoading, setIsLoading] = useState(true);
+interface TaskTableProps {
+   tasks: Task[];
+   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+};
+
+const TaskTable = ({
+   tasks,
+   setTasks,
+}: TaskTableProps) => {
    const [filter, setFilter] = useState("All");
    const [search, setSearch] = useState("");
    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-   const userId = useSelector((state: Store) => state.auth.userData?.user_id);
 
    const filteredTasks = tasks.filter((task) => {
       const matchesFilter = filter === "All" || getStatusUpdatedText(task.status) === filter;
@@ -66,43 +60,20 @@ const TaskTable = () => {
             icon: <CheckCircle className="h-6 w-6 text-green-500" />,
             style: {
                backgroundColor: "beige",
-            }
+            },
          });
 
          setTasks(prevTasks => prevTasks.filter(task => task.id !== id));
       } catch (error) {
          const axiosError = error as AxiosError<ServerResponse>;
-         console.log(axiosError);
-      };
-   };
-
-   const getUserTasks = async () => {
-      try {
-         const response = await axios.get<ServerResponse>(`http://localhost/task/u/${userId}`, {
-            headers: {
-               "Authorization": `Bearer ${localStorage.getItem("token")}`
+         toast(axiosError.response?.data.message!, {
+            icon: <AlertCircle className="h-6 w-6 text-red-500" />,
+            style: {
+               backgroundColor: "beige",
             },
          });
-
-         setTasks(response.data.tasks);
-      } catch (error) {
-         const axiosError = error as AxiosError<ServerResponse>;
-         console.log(axiosError);
-      } finally {
-         setIsLoading(false);
       };
    };
-
-   useEffect(() => {
-      setIsLoading(true);
-      getUserTasks();
-   }, []);
-
-   if (isLoading) return (
-      <div>
-         loading...
-      </div>
-   )
 
    return (
       <div className="container mx-auto">

@@ -4,4 +4,4 @@ export interface Task {
    status: string;
    title: string;
    description: string;
-}
+};
